@@ -605,7 +605,7 @@ select {
 .pastille-fam { width: 9px; height: 9px; border-radius: 3px; background: var(--fam); flex: none; }
 
 /* -------------------------------------------------------------- les fiches */
-.grille-fiches { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; align-items: start; }
+.grille-fiches { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; align-items: start; }
 
 .fiche { border-top: 3px solid var(--fam); }
 .fiche > header { align-items: flex-start; }
@@ -635,7 +635,13 @@ select {
 .replier svg { width: 14px; height: 14px; }
 
 .sql { position: relative; margin-top: 10px; }
-.sql .bloc-code { margin: 0; padding-right: 74px; color: var(--encre); }
+/* Le bloc de code du socle renvoie a la ligne et coupe les mots : bon pour
+   une donnee, illisible pour du SQL, ou « BETWEEN '2024-09' » se casse en
+   deux. Ici la ligne reste entiere et c'est le bloc qui defile. */
+.sql .bloc-code {
+  margin: 0; color: var(--encre);
+  white-space: pre; word-break: normal; overflow-x: auto;
+}
 .sql .copier {
   position: absolute; top: 6px; right: 6px;
   border: 1px solid var(--bord-fort); background: var(--surface);
@@ -776,6 +782,112 @@ select {
 .vue > .barre-filtres { top: 8px; }
 @media (max-width: 900px) { .vue > .barre-filtres { top: calc(var(--rail-replie) + 6px); } }
 
+/* ------------------------------------------------ la page d'accueil */
+
+/* Le bloc SQL porte desormais une etiquette : elle se range a gauche, le
+   bouton de copie reste a droite, et la reserve evite qu'ils se croisent. */
+.sql > .etiquette-champ { margin-bottom: 5px; padding-right: 74px; }
+.sql + .sql { margin-top: 12px; }
+
+.note-mesure { margin: 0; font-size: 12.5px; color: var(--encre-tres-doux); max-width: 80ch; }
+.mini-icone { width: 12px; height: 12px; flex: none; }
+
+/* Les quatre moments de la semaine : meme grille que les etapes de la
+   methode, puisque c'est la meme facon de lire - une suite, pas un choix. */
+.moments { display: grid; grid-template-columns: repeat(4, 1fr); }
+.moment { padding: 15px 17px; border-right: 1px solid var(--bord); display: flex; flex-direction: column; gap: 6px; }
+.moment:last-child { border-right: 0; }
+.moment .heure {
+  align-self: flex-start; background: var(--blue-950); color: #fff;
+  font-weight: 700; font-size: 12px; padding: 2px 9px; border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+}
+.moment h4 { margin: 2px 0 0; font-size: 14px; font-weight: 700; }
+.moment .quoi { margin: 0; font-size: 13px; color: var(--encre); }
+.moment .regime { margin: 0; font-size: 12.5px; color: var(--encre-doux); flex: 1; }
+.moment .jeton { align-self: flex-start; }
+@media (max-width: 1100px) {
+  .moments { grid-template-columns: repeat(2, 1fr); }
+  .moment:nth-child(2) { border-right: 0; }
+  .moment:nth-child(1), .moment:nth-child(2) { border-bottom: 1px solid var(--bord); }
+}
+@media (max-width: 660px) {
+  .moments { grid-template-columns: 1fr; }
+  .moment { border-right: 0; border-bottom: 1px solid var(--bord); }
+  .moment:last-child { border-bottom: 0; }
+}
+
+/* --------------------------------------------- la carte des familles */
+.cartographie { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; align-items: start; }
+@media (max-width: 1240px) { .cartographie { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px) { .cartographie { grid-template-columns: 1fr; } }
+
+.famille-carte {
+  border: 1px solid var(--bord); border-top: 3px solid var(--fam);
+  border-radius: var(--radius-md); background: var(--surface);
+  display: flex; flex-direction: column;
+}
+.famille-tete { padding: 12px 14px 10px; border-bottom: 1px solid var(--bord); background: var(--surface-2); }
+.famille-nom { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; }
+.famille-question { margin: 5px 0 0; font-size: 12.5px; color: var(--encre-doux); font-style: italic; }
+.famille-propos { margin: 0; padding: 12px 14px; font-size: 12.5px; color: var(--encre-doux); }
+
+/* Un sous-groupe n'est pas une categorie de plus a retenir : c'est la phrase
+   qui explique pourquoi deux index de la meme famille ne se remplacent pas. */
+.sous-groupe { padding: 10px 14px; border-top: 1px dashed var(--bord-fort); }
+.sous-titre { font-size: 12px; font-weight: 700; color: var(--encre); }
+.sous-note { font-size: 12px; color: var(--encre-tres-doux); margin-top: 2px; }
+.sous-index { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* Le nom d'un index, partout ou il apparait hors de sa fiche. Il mene a sa
+   fiche : la carte sert a circuler, pas seulement a regarder. */
+.puce-index {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 9px; border-radius: 999px; cursor: pointer;
+  font-size: 11.5px; font-weight: 600; white-space: nowrap;
+  background: var(--surface-2); color: var(--encre-doux); border: 1px solid var(--bord);
+}
+.puce-index:hover { color: var(--encre); border-color: var(--fam); }
+
+/* ------------------------------------------------------- les trois axes */
+.axes { display: flex; flex-direction: column; gap: 12px; }
+.axe { border: 1px solid var(--bord); border-radius: var(--radius-md); overflow: hidden; }
+.axe-titre {
+  padding: 8px 13px; background: var(--surface-2); border-bottom: 1px solid var(--bord);
+  font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--encre-doux);
+}
+.axe-cotes { display: grid; grid-template-columns: 1fr 1fr; }
+.cote { padding: 11px 13px; }
+.cote + .cote { border-left: 1px solid var(--bord); }
+@media (max-width: 760px) {
+  .axe-cotes { grid-template-columns: 1fr; }
+  .cote + .cote { border-left: 0; border-top: 1px solid var(--bord); }
+}
+.cote-libelle { font-size: 12.5px; font-weight: 600; color: var(--encre); }
+.cote-index { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* ----------------------------------------------------- dans les fiches */
+/* Ce qui distingue un index de son voisin merite sa place : c'est la
+   question qu'on se pose vraiment, une fois les douze fiches lues. */
+.versus { border-top: 1px dashed var(--bord-fort); padding-top: 11px; }
+.versus p { margin: 0; font-size: 13px; color: var(--encre-doux); }
+.versus p b { color: var(--encre); font-weight: 600; }
+
+/* --------------------------------------------------- tableau comparatif */
+.famille-cellule { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 12.5px; }
+#comparatif .cadre-table { max-height: none; }
+
+/* ------------------------------------------------ requetes de diagnostic */
+.diagnostics { display: flex; flex-direction: column; gap: 18px; }
+.diagnostic h4 { margin: 0 0 3px; font-size: 14px; font-weight: 700; }
+.diagnostic p { margin: 0 0 9px; font-size: 12.5px; color: var(--encre-doux); max-width: 80ch; }
+
+/* Une colonne qui ne parle pas de cet index : ni vert ni rouge, un tiret.
+   Sur une rangee de tableau deja teintee, l'encre tres douce tombe a 4,10
+   pour 1 : c'est l'encre douce qu'il faut, comme pour .etiquette-filtre. */
+.jeton.sans-objet { color: var(--encre-doux); background: transparent; border-style: dashed; }
+
 </style>
 </head>
 <body>
@@ -796,6 +908,7 @@ select {
       <li class="nav-groupe" role="presentation">Comprendre</li>
       <li><button type="button" data-page="principe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/></svg>Le principe</button></li>
       <li><button type="button" data-page="catalogue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg>Les 12 index</button></li>
+      <li><button type="button" data-page="comparer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4zM4 10h16M9 10v8"/></svg>Comparer</button></li>
       <li class="nav-groupe" role="presentation">Décider</li>
       <li><button type="button" data-page="choisir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10l-3-3M20 17H10l3 3"/></svg>Quel index ?</button></li>
       <li><button type="button" data-page="explorer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Explorer par besoin</button></li>
@@ -805,7 +918,8 @@ select {
 
     <div class="rail-pied">
       <b>Support de formation interne</b><br>
-      Index SQL Server appliqués au patrimoine, aux contrats et aux interventions d'un bailleur social.
+      Index SQL Server appliqués au patrimoine, aux contrats et au compte client d’un bailleur social.
+      <br><span class="tech" id="version">version 2f5e7a99</span>
     </div>
   </nav>
 
@@ -824,43 +938,99 @@ select {
         <div class="tuiles" id="chiffres"></div>
 
         <section class="carte">
-          <header><div><h3>Un index, c'est l'index d'un livre</h3>
-            <p>Le principe en une phrase, avant d'entrer dans les douze variantes.</p></div></header>
+          <header><div><h3>Un index, c’est l’index d’un livre</h3>
+            <p>Le principe en une phrase, avant d’entrer dans les douze variantes.</p></div></header>
           <div class="corps" style="display:flex;flex-direction:column;gap:13px">
-            <p class="intro">Un index est une structure qui permet au moteur de <b>localiser les données sans
-              parcourir toute la table</b>. Il accélère les lectures, mais il a un coût : chaque écriture
-              (INSERT / UPDATE / DELETE) doit aussi le mettre à jour. Tout l'art consiste à trouver le bon équilibre.</p>
+            <p class="intro">Un index est une structure qui permet au moteur de <b>localiser les lignes sans
+              parcourir toute la table</b>. Il accélère les lectures, mais chaque écriture — INSERT, UPDATE,
+              DELETE — doit aussi le mettre à jour. Un index n’est donc jamais gratuit : il déplace du temps
+              de la lecture vers l’écriture, et c’est ce déplacement qu’il faut arbitrer.</p>
             <div class="analogie fam-base">
-              <span class="qui">Logement social —</span> sans index, chercher le locataire du logement B205 revient à
-              ouvrir les 10 000 dossiers un par un. Avec index, on va droit au bon tiroir.
+              <span class="qui">Chez un bailleur —</span> sans index, retrouver le relevé de compte d’un
+              locataire revient à ouvrir les 1,7 million de lignes de l’historique une par une. Avec l’index
+              qu’il faut, le moteur en lit cinq pages.
             </div>
+          </div>
+        </section>
+
+        <section class="carte">
+          <header><div><h3>Chercher, ou balayer</h3>
+            <p>La même question — 24 mois de relevé pour un locataire — selon ce qu’on a posé sur la table.</p></div></header>
+          <div id="couts"></div>
+          <div class="corps" style="padding-top:12px">
+            <p class="note-mesure">Ordres de grandeur pour <span class="tech">releve_compte_client</span> :
+              1,7 million de lignes, une vingtaine de lignes par page de 8 Ko. Le rapport entre les trois
+              lignes compte plus que les valeurs absolues, qui dépendent de la largeur réelle des lignes.</p>
           </div>
         </section>
 
         <div class="duo">
           <section class="carte">
-            <header><div><h3>Ce que l'index fait gagner</h3></div></header>
+            <header><div><h3>Ce que l’index fait gagner</h3></div></header>
             <div class="corps">
               <div class="barres">
-                <div class="barre"><span class="libelle">Recherche ciblée</span><span class="piste"><span class="remplissage" style="width:96%"></span></span><span class="nombre">très fort</span></div>
-                <div class="barre"><span class="libelle">Jointures</span><span class="piste"><span class="remplissage" style="width:80%"></span></span><span class="nombre">fort</span></div>
-                <div class="barre"><span class="libelle">Tris et plages</span><span class="piste"><span class="remplissage" style="width:70%"></span></span><span class="nombre">fort</span></div>
-                <div class="barre"><span class="libelle">Agrégations</span><span class="piste"><span class="remplissage" style="width:88%"></span></span><span class="nombre">très fort</span></div>
+                <div class="barre"><span class="libelle">Relevé d’un client</span><span class="piste"><span class="remplissage" style="width:96%"></span></span><span class="nombre">très fort</span></div>
+                <div class="barre"><span class="libelle">Jointures du modèle</span><span class="piste"><span class="remplissage" style="width:80%"></span></span><span class="nombre">fort</span></div>
+                <div class="barre"><span class="libelle">Plages de mois, tris</span><span class="piste"><span class="remplissage" style="width:70%"></span></span><span class="nombre">fort</span></div>
+                <div class="barre"><span class="libelle">Agrégations de pilotage</span><span class="piste"><span class="remplissage" style="width:88%"></span></span><span class="nombre">très fort</span></div>
               </div>
             </div>
           </section>
           <section class="carte">
-            <header><div><h3>Ce que l'index coûte</h3></div></header>
+            <header><div><h3>Ce que l’index coûte</h3></div></header>
             <div class="corps">
               <div class="barres">
-                <div class="barre"><span class="libelle">Écritures (INSERT)</span><span class="piste"><span class="remplissage" style="width:62%;background:var(--rouge)"></span></span><span class="nombre">élevé</span></div>
-                <div class="barre"><span class="libelle">Mises à jour</span><span class="piste"><span class="remplissage" style="width:58%;background:var(--rouge)"></span></span><span class="nombre">élevé</span></div>
+                <div class="barre"><span class="libelle">Nuit de quittancement</span><span class="piste"><span class="remplissage" style="width:72%;background:var(--rouge)"></span></span><span class="nombre">élevé</span></div>
+                <div class="barre"><span class="libelle">Encaissements du jour</span><span class="piste"><span class="remplissage" style="width:55%;background:var(--rouge)"></span></span><span class="nombre">élevé</span></div>
                 <div class="barre"><span class="libelle">Espace disque</span><span class="piste"><span class="remplissage" style="width:45%;background:var(--ambre)"></span></span><span class="nombre">modéré</span></div>
-                <div class="barre"><span class="libelle">Maintenance</span><span class="piste"><span class="remplissage" style="width:40%;background:var(--ambre)"></span></span><span class="nombre">modéré</span></div>
+                <div class="barre"><span class="libelle">Fenêtre de maintenance</span><span class="piste"><span class="remplissage" style="width:40%;background:var(--ambre)"></span></span><span class="nombre">modéré</span></div>
               </div>
             </div>
           </section>
         </div>
+
+        <section class="carte">
+          <header><div><h3>Le modèle, et ce qu’on lui demande</h3>
+            <p>Sept tables, sept régimes de lecture et d’écriture très différents. C’est cette colonne de
+              droite qui dicte l’index, pas la taille de la table.</p></div></header>
+          <div id="modele"></div>
+        </section>
+
+        <section class="carte">
+          <header><div><h3>Quatre moments, quatre régimes d’index</h3>
+            <p>Une seule base, quatre charges qui n’ont presque rien en commun.</p></div></header>
+          <div class="moments" id="moments"></div>
+        </section>
+
+        <section class="carte">
+          <header><div><h3>La carte des familles</h3>
+            <p>Les douze index rangés par nature. À l’intérieur de chaque famille, les sous-groupes
+              disent ce qui sépare deux index voisins.</p></div></header>
+          <div class="corps">
+            <div class="cartographie" id="cartographie"></div>
+          </div>
+        </section>
+
+        <section class="carte">
+          <header><div><h3>Trois axes qui traversent les familles</h3>
+            <p>Deux index de familles différentes peuvent se ressembler sur un axe et s’opposer sur un
+              autre : c’est ce que la carte seule ne montre pas.</p></div></header>
+          <div class="corps">
+            <div class="axes" id="axes"></div>
+          </div>
+        </section>
+
+        <section class="carte">
+          <header><div><h3>L’ordre des colonnes décide de tout</h3>
+            <p>Un seul index — <span class="tech">IX_client_nom (Nom_client, Prenom_client)</span> — et sept
+              requêtes. Quatre sont servies, trois ne le sont pas.</p></div></header>
+          <div id="prefixe"></div>
+          <div class="corps" style="padding-top:12px">
+            <p class="note-mesure">La règle tient en une phrase : un index sert une requête tant qu’elle
+              part de <b>la gauche de la clé</b> et ne saute aucune colonne. C’est la première cause d’index
+              créés puis jamais utilisés.</p>
+          </div>
+        </section>
       </section>
 
       <!-- ------------------------------------------------------ le catalogue -->
@@ -869,13 +1039,39 @@ select {
           <span class="etiquette-filtre">Filtre</span>
           <label class="recherche">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-            <input type="search" id="recherche" placeholder="Chercher un index, un usage, un mot…" aria-label="Chercher un index">
+            <input type="search" id="recherche" placeholder="Chercher un index, une table, un usage…" aria-label="Chercher un index">
           </label>
           <div class="bascule" id="familles" role="group" aria-label="Famille d'index"></div>
           <button type="button" class="bouton-discret" id="effacer">Tout effacer</button>
           <span class="compte" id="compte"></span>
         </div>
         <div class="grille-fiches" id="fiches"></div>
+      </section>
+
+      <!-- --------------------------------------------------------- comparer -->
+      <section class="vue" id="vue-comparer">
+        <section class="carte">
+          <header><div><h3>Ce que chacun sait faire</h3>
+            <p>Une ligne par index. Les quatre colonnes du milieu se lisent ensemble : c’est leur
+              combinaison, jamais une seule d’entre elles, qui écarte ou retient un index.</p></div></header>
+          <div id="comparatif"></div>
+          <div class="corps" style="padding-top:12px">
+            <p class="note-mesure">Les trois premières colonnes portent sur une <b>valeur de colonne</b> :
+              un <span class="tech">=</span>, un <span class="tech">BETWEEN</span>, un
+              <span class="tech">GROUP BY</span>. Full-Text, Spatial et XML répondent à des questions d’une
+              autre nature — un mot dans une phrase, une distance, un chemin dans un document — qu’aucune
+              de ces colonnes ne décrit : leur ligne se lit dans la dernière colonne, d’où le tiret.</p>
+          </div>
+        </section>
+        <div class="avis">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <h4>« Coût en écriture » se lit par table, pas par index</h4>
+            <p>Un index léger sur une table écrite 75 000 fois par nuit coûte plus qu’un index lourd sur une
+              table modifiée deux fois par an. La colonne donne le coût unitaire ; c’est le volume d’écriture
+              de la table qui donne la facture.</p>
+          </div>
+        </div>
       </section>
 
       <!-- --------------------------------------------------------- choisir -->
@@ -912,23 +1108,23 @@ select {
       <!-- --------------------------------------------------------- methode -->
       <section class="vue" id="vue-methode">
         <section class="carte">
-          <header><div><h3>Une stratégie d'indexation en 4 temps</h3>
-            <p>L'ordre compte : on pose la structure avant de régler le détail.</p></div></header>
+          <header><div><h3>Une stratégie d’indexation en 4 temps</h3>
+            <p>L’ordre compte : on pose la structure avant de régler le détail.</p></div></header>
           <div class="etapes">
-            <div class="etape"><div class="rang">1</div><h4>Poser la base</h4><p>Un index clustered sur la clé primaire de chaque table pour asseoir les performances globales.</p></div>
-            <div class="etape"><div class="rang">2</div><h4>Requêtes fréquentes</h4><p>Des index non-clustered sur les colonnes qui reviennent dans les WHERE et les JOIN.</p></div>
-            <div class="etape"><div class="rang">3</div><h4>Cas particuliers</h4><p>Filtered pour les sous-ensembles, columnstore pour l'analytique intensive.</p></div>
-            <div class="etape"><div class="rang">4</div><h4>Réglage fin</h4><p>Colonnes incluses pour éviter les lookups, index calculés pour les formules récurrentes.</p></div>
+            <div class="etape"><div class="rang">1</div><h4>Poser la base</h4><p>Un clustered sur la clé primaire de chaque table. Clé étroite, croissante, stable : elle sera recopiée dans tous les autres index.</p></div>
+            <div class="etape"><div class="rang">2</div><h4>Servir les écrans</h4><p>Un non-clustered par requête fréquente, en partant des écrans réellement utilisés : recherche d’un dossier, relevé d’un client, liste des impayés.</p></div>
+            <div class="etape"><div class="rang">3</div><h4>Traiter les cas à part</h4><p>Filtré sur les sous-ensembles stables, columnstore sur l’historique agrégé, full-text et spatial quand la donnée n’est plus une valeur.</p></div>
+            <div class="etape"><div class="rang">4</div><h4>Régler au plan d’exécution</h4><p>Colonnes incluses là où un key lookup apparaît, colonne calculée là où un filtre porte sur une formule. Jamais avant d’avoir lu le plan.</p></div>
           </div>
         </section>
 
         <div class="avis">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           <div>
-            <h4>Trop d'index nuit</h4>
-            <p>Chaque index ralentit les écritures et occupe de l'espace. Indexez selon vos patterns de requêtes
-              réels, pas « au cas où ». Un index jamais lu mais toujours mis à jour est une dette pure — à
-              surveiller et à supprimer.</p>
+            <h4>Trop d’index nuit</h4>
+            <p>Chaque index ralentit les écritures et occupe de l’espace. Indexez sur vos requêtes réelles,
+              pas « au cas où ». Un index jamais lu mais maintenu à chaque quittancement est une dette pure :
+              il se mesure, et il se supprime.</p>
           </div>
         </div>
 
@@ -940,12 +1136,22 @@ select {
         </section>
 
         <section class="carte">
+          <header><div><h3>Deux requêtes à garder sous la main</h3>
+            <p>Les mêmes sur toutes les bases, à lancer avant d’ajouter ou de retirer quoi que ce soit.</p></div></header>
+          <div class="corps">
+            <div class="diagnostics" id="diagnostics"></div>
+          </div>
+        </section>
+
+        <section class="carte">
           <header><div><h3>Pour aller plus loin</h3></div></header>
           <div class="corps">
             <p class="intro">La documentation de référence :
               <a class="lien-sortant" href="https://learn.microsoft.com/fr-fr/sql/relational-databases/indexes/indexes" target="_blank" rel="noopener">Microsoft Learn — Index</a>.
-              La recommandation de ce guide est une aide à la réflexion : validez toujours avec un
-              <b>plan d'exécution réel</b> sur vos données.</p>
+              Les volumes cités dans ce guide sont des ordres de grandeur pour un bailleur d’environ
+              15 000 logements : ils servent à faire sentir une échelle. La recommandation de l’outil de
+              choix est une aide à la réflexion : validez toujours avec un
+              <b>plan d’exécution réel</b> sur vos données.</p>
           </div>
         </section>
       </section>
@@ -984,23 +1190,25 @@ var FAM = {
 /* Les pages du rail : ce que la scene annonce quand on les ouvre. */
 var PAGES = {
   principe:  { titre: 'Les index SQL, sans détour',
-               sous: "Ce qu'un index apporte, ce qu'il coûte — avant de choisir lequel poser." },
+               sous: "Ce qu'un index apporte, ce qu'il coûte, et comment les douze types se rangent les uns par rapport aux autres." },
   catalogue: { titre: "Les 12 types d'index",
-               sous: 'Filtrez par famille ou par mot, puis dépliez le SQL de chaque fiche.' },
+               sous: 'Chaque fiche montre la requête servie, l’index qui la sert, et ce qui le distingue de son voisin.' },
+  comparer:  { titre: 'Les douze, côte à côte',
+               sous: 'Le même tableau pour tous : ce que chacun sait faire, et ce qu’il coûte à l’écriture.' },
   choisir:   { titre: 'Quel index pour mon besoin ?',
                sous: 'Répondez aux questions : la recommandation se met à jour en direct.' },
   explorer:  { titre: 'Explorer le catalogue par besoin',
                sous: "Cochez une ou plusieurs caractéristiques : les index qui n'y répondent pas s'effacent." },
   methode:   { titre: "Mettre en œuvre une stratégie d'indexation",
-               sous: 'Dans quel ordre poser les index, et quels réflexes garder ensuite.' }
+               sous: 'Dans quel ordre poser les index, comment les surveiller, quand les retirer.' }
 };
 
 /* Les chiffres cles de la page d'accueil. */
 var CHIFFRES = [
   { etiquette: "Types d'index", valeur: '12', note: 'du clustered au hash en mémoire', accent: true },
-  { etiquette: 'Familles', valeur: '4', note: 'du fondamental à la haute performance' },
-  { etiquette: 'Gain possible', valeur: '×10', note: 'sur un reporting bien indexé (columnstore)' },
-  { etiquette: 'Compression', valeur: '×7', note: 'sur un stockage en colonnes' }
+  { etiquette: 'Familles', valeur: '4', note: 'et dix sous-groupes pour s’y retrouver' },
+  { etiquette: 'Relevé de compte', valeur: '1,7 M', note: 'lignes pour 15 000 logements sur dix ans' },
+  { etiquette: 'Nuit de quittancement', valeur: '75 000', note: 'lignes de facturation écrites en quelques minutes' }
 ];
 
 /* Icones : un trace par index, dans la maniere du socle. */
@@ -1019,239 +1227,530 @@ var IC = {
   clock: '<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>'
 };
 
-const INDEXES = [
-  {
-    id:"clustered", fam:"base", icon:"layers",
-    name:"Clustered", tagline:"Le rangement physique des données",
-    principle:"Trie et stocke physiquement les lignes de la table selon la clé. Une seule par table : les données ne peuvent être triées physiquement que d'une seule façon.",
-    analogy:"Vos dossiers papier rangés par numéro : <b>A101, A102, B201…</b> Pour trouver le logement B205, vous allez droit au bon tiroir.",
-    when:"À poser en premier, sur la <b>clé primaire</b> de chaque table. Excellent pour les recherches par <b>plage</b> et les tris.",
-    tags:["structure","plage","tri","egalite"],
-    sql:`CREATE CLUSTERED INDEX IX_Logements_Numero
-  ON Logements(NumeroLogement);`
-  },
-  {
-    id:"nonclustered", fam:"base", icon:"list",
-    name:"Non-Clustered", tagline:"Les répertoires vers les données",
-    principle:"Un index séparé qui pointe vers les lignes réelles. On peut en avoir plusieurs par table, comme plusieurs répertoires pour un même ensemble de dossiers.",
-    analogy:"Un répertoire alphabétique : <b>« Dupont → dossier A101 »</b>. Vous gardez le tri physique par numéro, mais accédez aux données par d'autres critères.",
-    when:"Pour les colonnes fréquentes en <b>WHERE</b> et <b>JOIN</b> : nom de locataire, bâtiment, statut…",
-    tags:["recherche","egalite","plage","join","oltp"],
-    sql:`CREATE NONCLUSTERED INDEX IX_Locataires_Nom
-  ON Locataires(Nom, Prenom);`
-  },
-  {
-    id:"unique", fam:"base", icon:"key",
-    name:"Unique", tagline:"La garantie d'unicité",
-    principle:"Empêche les doublons sur les colonnes indexées. Applicable en clustered ou non-clustered pour protéger l'intégrité.",
-    analogy:"Impossible d'avoir deux contrats avec le <b>même numéro</b>, ou deux locataires avec le <b>même e-mail</b>.",
-    when:"Dès qu'une valeur doit être <b>unique</b> métier : numéro de contrat, e-mail, référence fiscale.",
-    tags:["unicite","egalite"],
-    sql:`CREATE UNIQUE INDEX IX_Contrats_Numero
-  ON Contrats(NumeroContrat);`
-  },
-  {
-    id:"columnstore", fam:"spec", icon:"bars",
-    name:"Columnstore", tagline:"Pour l'analytique et le reporting",
-    principle:"Stockage en colonnes avec compression massive (jusqu'à ×7). Idéal pour les agrégations sur de gros volumes historiques (jusqu'à ×10 en vitesse).",
-    analogy:"« Quel est le <b>loyer moyen par type sur 5 ans</b> ? » : le columnstore balaie une colonne compressée au lieu de millions de lignes.",
-    when:"Pour l'<b>entrepôt de données</b>, les reportings, les agrégations massives et les chargements en masse.",
-    tags:["analytique","agregation","historique","compression"],
-    sql:`CREATE CLUSTERED COLUMNSTORE INDEX IX_HistoriquePaiements
-  ON HistoriquePaiements;`
-  },
-  {
-    id:"filtered", fam:"spec", icon:"filter",
-    name:"Filtré", tagline:"Un index ciblé sur un sous-ensemble",
-    principle:"N'indexe qu'une partie des lignes via un prédicat WHERE. Moins de stockage, maintenance allégée, recherches plus rapides.",
-    analogy:"Indexer uniquement les <b>200 logements vacants</b> plutôt que les 10 000 logements totaux.",
-    when:"Quand vos requêtes visent toujours le <b>même sous-ensemble</b> : vacants, impayés, contrats actifs.",
-    tags:["sousensemble","ciblage","recherche"],
-    sql:`CREATE NONCLUSTERED INDEX IX_Logements_Vacants
-  ON Logements(DateLiberation)
-  WHERE Statut = 'Vacant';`
-  },
-  {
-    id:"included", fam:"spec", icon:"columns",
-    name:"Colonnes incluses", tagline:"Éviter les allers-retours",
-    principle:"Un index non-clustered enrichi de colonnes supplémentaires (non-clés). La requête est « couverte » : toutes les infos sont dans l'index.",
-    analogy:"En cherchant par <b>code postal</b>, l'adresse, la ville et le loyer sont déjà là — inutile d'ouvrir le dossier complet.",
-    when:"Pour supprimer les <b>key lookups</b> quand une requête renvoie toujours les mêmes colonnes.",
-    tags:["couverture","eviter-lookup","recherche"],
-    sql:`CREATE NONCLUSTERED INDEX IX_Logements_CodePostal
-  ON Logements(CodePostal)
-  INCLUDE (Adresse, Ville, TypeLogement, Surface, Loyer);`
-  },
-  {
-    id:"computed", fam:"adv", icon:"calc",
-    name:"Sur colonnes calculées", tagline:"Indexer une valeur dérivée",
-    principle:"Index sur une colonne calculée persistée. Permet de rechercher sur une formule sans la recalculer à chaque requête.",
-    analogy:"« Logements avec un <b>loyer hors charges entre 400 € et 600 €</b> » : la valeur est pré-calculée et indexée.",
-    when:"Quand vous filtrez souvent sur une <b>expression</b> (différence, concaténation, extraction de date…).",
-    tags:["calcul","formule","recherche","plage"],
-    sql:`ALTER TABLE Contrats
-  ADD LoyerHorsCharges AS
-  (LoyerChargesComprises - Charges) PERSISTED;
+/* ===========================================================================
+   Les donnees du guide.
 
-CREATE NONCLUSTERED INDEX IX_Contrats_LoyerHC
-  ON Contrats(LoyerHorsCharges);`
-  },
-  {
-    id:"fulltext", fam:"adv", icon:"search",
-    name:"Full-Text", tagline:"Recherche dans le texte long",
-    principle:"Recherche linguistique sophistiquée dans de longs textes : gère fautes, formes fléchies et synonymes, bien au-delà du LIKE.",
-    analogy:"Chercher <b>« fuite chauffage radiateur »</b> dans 5 ans d'historique d'interventions, même mal orthographié.",
-    when:"Pour la recherche <b>plein texte</b> : descriptions d'interventions, courriers, comptes-rendus.",
-    tags:["texte","recherche-texte"],
-    sql:`CREATE FULLTEXT CATALOG CatalogInterventions;
+   Le schema des exemples est celui des extractions de gestion : patrimoine,
+   lot, client, quittance, releve_compte_client, contentieux_client. Les noms
+   de colonnes sont ceux qu'on lit dans les exports du systeme, pour qu'un
+   exemple se transpose sans traduction.
 
-CREATE FULLTEXT INDEX ON Interventions(Description)
-  KEY INDEX PK_Interventions
-  ON CatalogInterventions;`
-  },
-  {
-    id:"spatial", fam:"adv", icon:"map",
-    name:"Spatial", tagline:"Les requêtes géographiques",
-    principle:"Optimise les requêtes sur des objets géométriques / géographiques en réduisant le nombre d'objets à comparer.",
-    analogy:"« Tous les logements dans un <b>rayon de 500 m</b> d'une future station de métro » — sans calculer la distance un à un.",
-    when:"Dès qu'il y a des <b>coordonnées</b> : proximité, zones, distances, cartographie du patrimoine.",
-    tags:["geo","recherche"],
-    sql:`CREATE SPATIAL INDEX IX_Logements_Position
-  ON Logements(Coordonnees)
-  USING GEOMETRY_GRID;`
-  },
-  {
-    id:"xml", fam:"adv", icon:"code",
-    name:"XML", tagline:"Interroger des données XML",
-    principle:"Fragmente et indexe les colonnes de type xml pour accélérer les requêtes XQuery / XPath sans tout parser.",
-    analogy:"Stocker les <b>diagnostics DPE en XML</b> et chercher « logements avec DPE = E » sans lire tout le document.",
-    when:"Quand des données semi-structurées vivent dans des colonnes <b>xml</b> (DPE, formulaires, échanges).",
-    tags:["xml","recherche"],
-    sql:`CREATE PRIMARY XML INDEX IX_Logements_DPE_Primary
-  ON Logements(DiagnosticXML);`
-  },
-  {
-    id:"hash", fam:"mem", icon:"zap",
-    name:"Hash (mémoire)", tagline:"Égalité stricte à la microseconde",
-    principle:"Table de hachage en mémoire (OLTP in-memory). Accès en microsecondes, mais uniquement pour l'égalité exacte.",
-    analogy:"Vérifier en un éclair « <b>cette session utilisateur existe-t-elle ?</b> » sur une table optimisée en mémoire.",
-    when:"Pour une <b>latence extrême</b> sur des recherches d'<b>égalité exacte</b> (=), pas de plages ni de tris.",
-    tags:["egalite","memoire","latence","oltp"],
-    sql:`CREATE TABLE SessionsUtilisateurs (
-  SessionID NVARCHAR(50),
-  INDEX IX_Hash_SessionID HASH (SessionID)
-    WITH (BUCKET_COUNT = 100000)
-) WITH (MEMORY_OPTIMIZED = ON);`
-  },
-  {
-    id:"ncmemory", fam:"mem", icon:"clock",
-    name:"Non-Cluster mémoire", tagline:"Plages et tris ultra-rapides",
-    principle:"Index non-clustered pour tables en mémoire : supporte les plages et l'ORDER BY, avec des performances extrêmes.",
-    analogy:"La <b>file d'attente des demandes de logement</b> en mémoire, triée par date d'inscription pour les attributions.",
-    when:"Latence extrême <b>avec</b> besoin de <b>plages / tri</b> (BETWEEN, ORDER BY) sur table en mémoire.",
-    tags:["plage","tri","memoire","latence"],
-    sql:`CREATE TABLE FileAttenteDemandesLogement (
-  DemandeID INT PRIMARY KEY,
-  INDEX IX_DateInscription NONCLUSTERED (DateInscription)
-) WITH (MEMORY_OPTIMIZED = ON);`
-  },
+   Les volumes cites sont des ordres de grandeur pour un bailleur d'environ
+   15 000 logements. Ils servent a faire sentir une echelle, pas a etre
+   repris tels quels.
+   =========================================================================== */
+
+/* Les tables du modele, et ce qu'on leur demande. */
+var MODELE = [
+  { table: 'patrimoine', grain: 'une adresse, un groupe',
+    volume: '≈ 1 500', ecriture: 'rare', lecture: 'jointure, géographie' },
+  { table: 'lot', grain: 'un logement',
+    volume: '≈ 15 000', ecriture: 'rare', lecture: 'recherche par code, jointure' },
+  { table: 'client', grain: 'un occupant sur un lot',
+    volume: '≈ 120 000', ecriture: 'quotidienne', lecture: 'recherche par nom, par code' },
+  { table: 'quittance', grain: 'une quittance mensuelle',
+    volume: '≈ 1 800 000', ecriture: '15 000 par mois, en lot', lecture: 'relevé d’un client' },
+  { table: 'ligne_quittance', grain: 'une ligne de facturation',
+    volume: '≈ 9 000 000', ecriture: '75 000 par mois, en lot', lecture: 'détail d’une quittance' },
+  { table: 'releve_compte_client', grain: 'un client et un mois',
+    volume: '≈ 1 700 000', ecriture: '15 000 par mois, en lot', lecture: 'relevé, pilotage' },
+  { table: 'contentieux_client', grain: 'un client et un mois en procédure',
+    volume: '≈ 90 000', ecriture: 'quotidienne', lecture: 'filtre sur procédure active' }
 ];
 
-const PRACTICES = [
-  {icon:"bars", t:"Équilibrer lecture et écriture", d:"Les index accélèrent les lectures mais ralentissent les écritures. Analysez vos patterns de requêtes pour trouver le juste milieu."},
-  {icon:"search", t:"Surveiller l'utilisation", d:"Repérez les index inutilisés ou redondants avec les DMV SQL Server (dm_db_index_usage_stats) et faites le ménage."},
-  {icon:"clock", t:"Entretenir régulièrement", d:"Planifiez la reconstruction ou la réorganisation des index fragmentés pour garder des performances stables."},
-  {icon:"code", t:"Documenter la stratégie", d:"Gardez une trace claire de chaque choix d'index et de sa raison d'être. La prochaine équipe vous remerciera."},
+/* Quatre moments de la semaine, quatre regimes d'index. C'est la meme base. */
+var MOMENTS = [
+  { heure: '22 h', titre: 'La nuit du quittancement',
+    quoi: '15 000 quittances et 75 000 lignes de facturation écrites en quelques minutes.',
+    regime: 'Chaque index non-clustered de <b>ligne_quittance</b> est maintenu 75 000 fois. Ici l’index se paie : on en met le moins possible, quitte à le reconstruire après le lot.',
+    index: 'Le moins d’index possible' },
+  { heure: '9 h', titre: 'Le guichet',
+    quoi: '« Le relevé de M. Kervadec sur 24 mois », dans 1,7 million de lignes.',
+    regime: 'Une lecture très ciblée, toujours la même forme : un client, une plage de mois, les mêmes colonnes renvoyées.',
+    index: 'Clustered bien choisi, index couvrant' },
+  { heure: '11 h', titre: 'L’agent en visite',
+    quoi: 'Retrouver un dossier par le nom, l’adresse, ou ce qui est à moins de 500 m.',
+    regime: 'Des questions de formes très différentes sur de petites tables : le nom, le texte libre d’un compte rendu, une distance.',
+    index: 'Non-clustered, full-text, spatial' },
+  { heure: '18 h', titre: 'Le rapport de pilotage',
+    quoi: '« L’impayé moyen par secteur et par mois sur cinq ans. »',
+    regime: 'Une agrégation qui balaie tout l’historique mais n’utilise que trois colonnes sur trente.',
+    index: 'Columnstore' }
 ];
 
-/* =========================================================
-   QUESTIONNAIRE — chaque option pointe vers des index + raison
-   ========================================================= */
-const QUESTIONS = [
-  {
-    id:"role", type:"radio", n:1,
-    title:"Quel est le rôle de la colonne à indexer ?",
-    sub:"Le point de départ de toute table.",
-    options:[
-      {v:"pk", t:"C'est la clé primaire / la structure de base", d:"Identifiant, ordre naturel des lignes",
-        eff:[{id:"clustered",w:3,r:"Index clustered = fondation posée sur la clé primaire."}]},
-      {v:"search", t:"C'est une colonne de recherche fréquente", d:"Utilisée dans WHERE / JOIN",
-        eff:[{id:"nonclustered",w:3,r:"Colonne fréquente en WHERE/JOIN : cas d'école du non-clustered."}]},
-    ]
-  },
-  {
-    id:"search", type:"radio", n:2,
-    title:"Quel type de recherche domine ?",
-    sub:"La forme du filtre oriente fortement le choix.",
-    options:[
-      {v:"eq", t:"Égalité exacte", d:"Statut = 'Vacant', Numero = 12345",
-        eff:[{id:"nonclustered",w:2,r:"L'égalité exacte se traite très bien en non-clustered."}]},
-      {v:"range", t:"Plage ou tri", d:"BETWEEN, >, <, ORDER BY",
-        eff:[{id:"clustered",w:2,r:"Les plages et tris tirent parti de l'ordre physique du clustered."},{id:"nonclustered",w:1,r:"Un non-clustered ordonné couvre aussi les plages ciblées."}]},
-      {v:"text", t:"Dans du texte long", d:"Descriptions, courriers, comptes-rendus",
-        eff:[{id:"fulltext",w:4,r:"Recherche plein texte : le full-text gère fautes et synonymes."}]},
-      {v:"geo", t:"Géographique", d:"Rayon, distance, zones",
-        eff:[{id:"spatial",w:4,r:"Requêtes de proximité / distance : c'est le rôle de l'index spatial."}]},
-      {v:"xml", t:"Dans des données XML", d:"DPE, formulaires stockés en xml",
-        eff:[{id:"xml",w:4,r:"Interrogation XQuery/XPath : l'index XML évite de tout parser."}]},
-    ]
-  },
-  {
-    id:"charge", type:"radio", n:3,
-    title:"Quelle est la nature de la charge ?",
-    sub:"Transactionnel au fil de l'eau, ou analytique de masse ?",
-    options:[
-      {v:"oltp", t:"Transactionnel (OLTP)", d:"Beaucoup d'écritures, lectures ciblées",
-        eff:[{id:"nonclustered",w:1,r:"En OLTP, des non-clustered ciblés gardent les écritures légères."}]},
-      {v:"olap", t:"Analytique / reporting", d:"Agrégations massives, gros historiques",
-        eff:[{id:"columnstore",w:4,r:"Agrégations massives sur historique : le columnstore change d'échelle."}]},
-    ]
-  },
-  {
-    id:"contraintes", type:"checkbox", n:4,
-    title:"Des contraintes particulières ?",
-    sub:"Plusieurs choix possibles.",
-    options:[
-      {v:"unique", t:"Garantir l'unicité", d:"Pas de doublons possibles",
-        eff:[{id:"unique",w:3,r:"Besoin d'unicité stricte : l'index unique la garantit."}]},
-      {v:"subset", t:"Ne viser qu'un sous-ensemble", d:"Ex : uniquement les logements vacants",
-        eff:[{id:"filtered",w:3,r:"Requêtes toujours sur un sous-ensemble : l'index filtré est plus léger et plus rapide."}]},
-      {v:"cover", t:"Éviter les allers-retours (lookups)", d:"Renvoyer plusieurs colonnes d'un coup",
-        eff:[{id:"included",w:3,r:"Pour couvrir la requête sans key lookup : colonnes incluses."}]},
-      {v:"formula", t:"Filtrer sur une valeur calculée", d:"Ex : loyer hors charges",
-        eff:[{id:"computed",w:3,r:"Filtre récurrent sur une formule : index sur colonne calculée."}]},
-      {v:"latency", t:"Latence extrême en mémoire", d:"Réponse à la microseconde",
-        eff:[{id:"hash",w:3,r:"Latence extrême en égalité stricte : index hash en mémoire."},{id:"ncmemory",w:2,r:"Latence extrême avec plages/tri : non-clustered en mémoire."}]},
-    ]
-  },
+/* Ce que coute la meme question selon ce qu'on a pose. Ordres de grandeur
+   pour releve_compte_client : 1,7 M de lignes, environ 20 lignes par page. */
+var COUTS = [
+  { cas: 'Aucun index : balayage complet de la table',
+    pages: '≈ 85 000 pages', verdict: 'rouge', note: 'le disque lit 700 Mo pour 24 lignes' },
+  { cas: 'Index sur (ID_client, Annee_mois), colonnes cherchées dans la table',
+    pages: '≈ 30 pages', verdict: 'ambre', note: '3 niveaux d’arbre, puis 24 allers-retours' },
+  { cas: 'Le même index, colonnes renvoyées en INCLUDE',
+    pages: '≈ 5 pages', verdict: 'vert', note: 'tout est dans l’index, aucun retour à la table' }
 ];
 
-// affinage croisé : latence + type de recherche
-const CROSS = (ans)=>{
-  const bump=[];
-  const contr = ans.contraintes||[];
-  if(contr.includes("latency")){
-    if(ans.search==="eq"){bump.push({id:"hash",w:2,r:"Égalité exacte + mémoire : le hash est le plus direct."});}
-    if(ans.search==="range"){bump.push({id:"ncmemory",w:2,r:"Plage/tri + mémoire : c'est exactement le non-clustered en mémoire."});}
+/* L'ordre des colonnes de la cle decide de ce que l'index sert. Toutes ces
+   requetes portent sur le meme index : IX_client_nom (Nom_client, Prenom_client). */
+var PREFIXE = [
+  { requete: "WHERE Nom_client = 'Kervadec'", ok: true, quoi: 'Recherche directe' },
+  { requete: "WHERE Nom_client = 'Kervadec' AND Prenom_client = 'Mikael'", ok: true, quoi: 'Recherche directe, plus précise' },
+  { requete: "WHERE Prenom_client = 'Mikael'", ok: false, quoi: 'Balayage : le prénom n’est pas en tête' },
+  { requete: "WHERE Nom_client LIKE 'Kerv%'", ok: true, quoi: 'Recherche par préfixe' },
+  { requete: "WHERE Nom_client LIKE '%vadec'", ok: false, quoi: 'Balayage : joker en tête' },
+  { requete: 'ORDER BY Nom_client, Prenom_client', ok: true, quoi: 'Déjà trié, aucun tri à faire' },
+  { requete: 'ORDER BY Prenom_client', ok: false, quoi: 'Tri complet du résultat' }
+];
+
+var INDEXES = [
+  {
+    id: 'clustered', fam: 'base', icon: 'layers',
+    name: 'Clustered', tagline: 'Le rangement physique de la table',
+    principle: "Il ne s'ajoute pas à la table : il <b>est</b> la table. Ses feuilles portent les lignes elles-mêmes, triées sur la clé. D'où la règle : une seule par table, puisqu'un jeu de lignes ne peut être rangé physiquement que d'une seule façon.",
+    analogy: "le relevé de compte est interrogé neuf fois sur dix par client, puis par mois. Le ranger physiquement sur <b>(ID_client, Annee_mois)</b> met les 24 derniers mois d'un locataire dans les mêmes pages : une lecture contiguë au lieu d'une dispersion sur tout le disque.",
+    query: `SELECT Annee_mois, Montant_loyer, Montant_impaye
+FROM   dbo.releve_compte_client
+WHERE  ID_client = 'CLI-00001'
+  AND  Annee_mois BETWEEN '2024-09' AND '2026-09'
+ORDER  BY Annee_mois;`,
+    sql: `CREATE UNIQUE CLUSTERED INDEX CX_releve_compte_client
+    ON dbo.releve_compte_client (ID_client, Annee_mois);`,
+    when: "À poser en premier, sur chaque table. Choisir une clé <b>étroite, croissante et stable</b> : elle est recopiée dans tous les index non-clustered de la table.",
+    versus: "À ne pas confondre avec le non-clustered, qui est une structure posée <b>à côté</b> de la table et porte la clé du clustered pour revenir aux lignes. Conséquence directe : une clé de clustered large alourdit chaque index de la table, sans qu'on l'ait demandé.",
+    tags: ['structure', 'plage', 'tri', 'egalite'],
+    cmp: { eg: 'oui', plage: 'oui', agr: 'non', ecr: 'inclus', pour: 'La structure de toute table' }
+  },
+  {
+    id: 'nonclustered', fam: 'base', icon: 'list',
+    name: 'Non-Clustered', tagline: 'Le répertoire posé à côté',
+    principle: "Une structure séparée, triée sur ses propres colonnes, dont les feuilles portent la clé du clustered pour retrouver la ligne complète. Plusieurs par table — jusqu'à 999 — mais chacun se paie à chaque écriture.",
+    analogy: "au guichet, on cherche un locataire par son nom, jamais par son identifiant technique. Un index sur <b>(Nom_client, Prenom_client)</b> transforme le balayage des 120 000 occupants — présents et passés — en un accès direct.",
+    query: `SELECT ID_client, Code_client, ID_lot
+FROM   dbo.client
+WHERE  Nom_client = 'Kervadec'
+  AND  Prenom_client = 'Mikael';`,
+    sql: `CREATE NONCLUSTERED INDEX IX_client_nom
+    ON dbo.client (Nom_client, Prenom_client);`,
+    when: "Pour les colonnes qui reviennent dans les <b>WHERE</b> et les <b>JOIN</b> : nom, code client, identifiant de lot, mois d'arrêté, référent.",
+    versus: "L'ordre des colonnes décide de tout. <b>(Nom_client, Prenom_client)</b> sert « Nom = » et « Nom = et Prénom = », jamais « Prénom = » seul : c'est un annuaire, on n'y cherche pas par le prénom.",
+    tags: ['recherche', 'egalite', 'plage', 'join', 'oltp'],
+    cmp: { eg: 'oui', plage: 'oui', agr: 'non', ecr: 'moyen', pour: 'Les WHERE et JOIN fréquents' }
+  },
+  {
+    id: 'unique', fam: 'base', icon: 'key',
+    name: 'Unique', tagline: "L'unicité tenue par la structure",
+    principle: "Le même index qu'un non-clustered, avec un refus en plus : toute valeur déjà présente est rejetée à l'écriture. C'est lui, concrètement, qui fait tenir une contrainte <b>UNIQUE</b> ou une clé primaire.",
+    analogy: "deux quittances portant le même numéro pour la même société, c'est un litige comptable et une régularisation manuelle. La base doit le refuser au moment de l'écriture, pas l'application trois écrans plus haut.",
+    query: `INSERT dbo.quittance (Code_societe, Numero_quittance, ID_client, Annee_mois)
+VALUES ('035', 'Q-2026-000412', 'CLI-00001', '2026-09');
+-- Msg 2601 : le numéro existe déjà, rien n'est écrit`,
+    sql: `CREATE UNIQUE NONCLUSTERED INDEX UX_quittance_numero
+    ON dbo.quittance (Code_societe, Numero_quittance);`,
+    when: "Dès qu'une valeur doit être unique <b>métier</b> : numéro de quittance, code client, référence de contrat, couple lot + mois.",
+    versus: "Le piège que tout le monde rencontre une fois : SQL Server considère deux <b>NULL</b> comme égaux, un index unique n'en accepte donc <b>qu'un seul</b>. Pour autoriser plusieurs valeurs absentes, il faut un index unique <b>filtré</b> : <b>WHERE Numero_fiscal IS NOT NULL</b>.",
+    tags: ['unicite', 'egalite'],
+    cmp: { eg: 'oui', plage: 'oui', agr: 'non', ecr: 'moyen', pour: "Garantir l'unicité" }
+  },
+  {
+    id: 'columnstore', fam: 'spec', icon: 'bars',
+    name: 'Columnstore', tagline: 'L’analytique, colonne par colonne',
+    principle: "Les données sont rangées par colonne et non par ligne, en groupes d'environ un million de lignes, compressés. Une agrégation ne lit alors que les colonnes citées. Microsoft annonce jusqu'à dix fois moins de stockage et dix fois moins de temps sur ce type de requête.",
+    analogy: "« l'impayé moyen par quartier et par mois sur cinq ans » balaie 1,7 million de lignes de relevé. En stockage par ligne, le moteur lit des lignes entières de trente colonnes pour n'en utiliser que trois ; en colonnes, il ne lit que les trois.",
+    query: `SELECT   p.Code_quartier, r.Annee_mois,
+         AVG(r.Montant_impaye) AS Impaye_moyen
+FROM     dbo.releve_compte_client  AS r
+JOIN     dbo.client                AS c ON c.ID_client = r.ID_client
+JOIN     dbo.lot                   AS l ON l.ID_lot = c.ID_lot
+JOIN     dbo.patrimoine            AS p ON p.ID_patrimoine = l.ID_patrimoine
+GROUP BY p.Code_quartier, r.Annee_mois;`,
+    sql: `-- sur l'historique, qui ne se modifie plus ligne à ligne
+CREATE CLUSTERED COLUMNSTORE INDEX CCI_releve_compte_historique
+    ON dbo.releve_compte_client_historique;`,
+    when: "Pour l'entrepôt, le relevé historisé, les lignes de quittance archivées : tout ce qu'on agrège et qu'on ne modifie plus une ligne à la fois.",
+    versus: "Ce n'est pas « un non-clustered plus rapide », c'est un autre monde. Le <b>clustered</b> columnstore remplace le stockage de la table ; le <b>non-clustered</b> columnstore se pose à côté d'une table ordinaire, pour servir le pilotage sans gêner le quittancement.",
+    tags: ['analytique', 'agregation', 'historique', 'compression'],
+    cmp: { eg: 'non', plage: 'non', agr: 'oui', ecr: 'lourd', pour: 'Reporting et historique' }
+  },
+  {
+    id: 'filtered', fam: 'spec', icon: 'filter',
+    name: 'Filtré', tagline: 'Le même index, sur moins de lignes',
+    principle: "Un non-clustered assorti d'un <b>WHERE</b> : seules les lignes qui satisfont le prédicat entrent dans l'index. Moins de pages, maintenance allégée, et des statistiques calculées sur la seule population qui intéresse.",
+    analogy: "sur 1,7 million de lignes de relevé, moins d'une sur dix porte un impayé. Le pilotage du recouvrement ne regarde jamais les autres : autant n'indexer que celles-là, et garder un index dix fois plus petit.",
+    query: `SELECT ID_client, Annee_mois, Montant_impaye
+FROM   dbo.releve_compte_client
+WHERE  Montant_impaye > 0
+  AND  Annee_mois = '2026-09'
+ORDER  BY Montant_impaye DESC;`,
+    sql: `CREATE NONCLUSTERED INDEX IX_releve_impaye
+    ON dbo.releve_compte_client (Annee_mois, Montant_impaye DESC)
+    INCLUDE (ID_client)
+    WHERE Montant_impaye > 0;`,
+    when: "Quand les requêtes visent toujours le même sous-ensemble : les impayés, les baux en cours (<b>Date_fin_occupation IS NULL</b>), les procédures actives.",
+    versus: "Le filtré réduit les <b>lignes</b> ; l'index sur colonne calculée ajoute une <b>valeur</b>. Piège à connaître : l'optimiseur n'utilise l'index filtré que s'il peut prouver que la requête reste dans le filtre — un prédicat paramétré comme <b>WHERE Montant_impaye > @seuil</b> l'écarte le plus souvent.",
+    tags: ['sousensemble', 'ciblage', 'recherche'],
+    cmp: { eg: 'oui', plage: 'oui', agr: 'non', ecr: 'leger', pour: 'Un sous-ensemble stable' }
+  },
+  {
+    id: 'included', fam: 'spec', icon: 'columns',
+    name: 'Colonnes incluses', tagline: 'Couvrir la requête sans élargir la clé',
+    principle: "Des colonnes supplémentaires rangées au seul niveau feuille de l'index. Elles ne servent ni au tri ni à la recherche, mais elles évitent le retour à la table — le <b>key lookup</b>, qui coûte un accès par ligne trouvée.",
+    analogy: "l'écran de relevé affiche loyer, charges, APL et solde pour un client sur une plage de mois. Sans colonnes incluses, le moteur trouve chaque ligne dans l'index puis retourne chercher les quatre montants dans la table — vingt-quatre fois pour deux ans.",
+    query: `SELECT Annee_mois, Montant_loyer, Montant_charges,
+       Montant_APL, Montant_solde_client
+FROM   dbo.releve_compte_client
+WHERE  ID_client = 'CLI-00001'
+  AND  Annee_mois >= '2025-01';`,
+    sql: `CREATE NONCLUSTERED INDEX IX_releve_client_mois
+    ON dbo.releve_compte_client (ID_client, Annee_mois)
+    INCLUDE (Montant_loyer, Montant_charges,
+             Montant_APL, Montant_solde_client);`,
+    when: "Quand un plan d'exécution montre un <b>key lookup</b> sur une requête fréquente, et que cette requête renvoie toujours les mêmes colonnes.",
+    versus: "Une colonne incluse n'est pas une colonne de clé. Dans la <b>clé</b> va ce sur quoi on filtre et on trie ; dans l'<b>INCLUDE</b> ce que la requête renvoie. Inverser les deux fait grossir l'arbre sans rien accélérer.",
+    tags: ['couverture', 'eviter-lookup', 'recherche'],
+    cmp: { eg: 'oui', plage: 'oui', agr: 'non', ecr: 'moyen', pour: 'Supprimer les key lookups' }
+  },
+  {
+    id: 'computed', fam: 'adv', icon: 'calc',
+    name: 'Sur colonne calculée', tagline: "Indexer une valeur qui n'est pas stockée",
+    principle: "Une colonne calculée <b>PERSISTED</b> est écrite sur le disque comme les autres : elle devient donc indexable. La formule n'est plus évaluée à chaque requête, et le filtre porte sur une vraie colonne.",
+    analogy: "le loyer résiduel — loyer moins APL — n'est pas stocké : c'est une différence. Tant qu'il reste une formule, tout filtre dessus force le moteur à la calculer pour chacune des 1,7 million de lignes avant de décider.",
+    query: `SELECT ID_client, Annee_mois, Montant_loyer_residuel
+FROM   dbo.releve_compte_client
+WHERE  Montant_loyer_residuel BETWEEN 200 AND 400;`,
+    sql: `ALTER TABLE dbo.releve_compte_client
+    ADD Montant_loyer_residuel AS
+        (Montant_loyer - Montant_APL) PERSISTED;
+
+CREATE NONCLUSTERED INDEX IX_releve_loyer_residuel
+    ON dbo.releve_compte_client (Montant_loyer_residuel);`,
+    when: "Quand un filtre récurrent porte sur une <b>expression</b> : une différence, une concaténation, un mois extrait d'une date.",
+    versus: "<b>PERSISTED</b> n'est pas un confort d'écriture : sans lui, l'expression doit être déterministe et précise pour être indexable, et le moteur la recalcule. À l'inverse de l'index filtré, qui enlève des lignes, celui-ci ajoute une colonne.",
+    tags: ['calcul', 'formule', 'recherche', 'plage'],
+    cmp: { eg: 'oui', plage: 'oui', agr: 'non', ecr: 'moyen', pour: 'Filtrer sur une formule' }
+  },
+  {
+    id: 'fulltext', fam: 'adv', icon: 'search',
+    name: 'Full-Text', tagline: 'Chercher dans une phrase',
+    principle: "Un index inversé, mot par mot, avec lemmatisation et mots vides. Il répond à <b>CONTAINS</b> et <b>FREETEXT</b> : formes fléchies, proximité, pondération — ce qu'un arbre B ne sait pas faire.",
+    analogy: "cinq ans de comptes rendus d'intervention en texte libre. « A-t-on déjà eu une fuite sur la colonne de chauffage du groupe Les Écluses ? » ne se répond pas en cherchant un mot exact.",
+    query: `SELECT i.ID_intervention, i.Date_intervention, i.Libelle_nature
+FROM   dbo.intervention AS i
+JOIN   dbo.lot AS l ON l.ID_lot = i.ID_lot
+WHERE  l.ID_patrimoine = 'PAT-0001'
+  AND  CONTAINS (i.Description, 'NEAR((fuite, chauffage), 10)');`,
+    sql: `CREATE FULLTEXT CATALOG FTC_intervention AS DEFAULT;
+
+-- LANGUAGE 1036 : analyse en français (pluriels, conjugaisons)
+CREATE FULLTEXT INDEX ON dbo.intervention (Description LANGUAGE 1036)
+    KEY INDEX PK_intervention
+    ON FTC_intervention
+    WITH CHANGE_TRACKING AUTO;`,
+    when: "Pour la recherche en langue : comptes rendus d'intervention, courriers, observations d'état des lieux, réclamations.",
+    versus: "Le contre-exemple est <b>LIKE '%fuite%'</b> : un joker en tête interdit tout index d'arbre et finit toujours en balayage. Le full-text a sa propre structure, exige une clé unique à une seule colonne (<b>KEY INDEX</b>) et se rafraîchit en tâche de fond — il peut donc avoir quelques secondes de retard sur la table.",
+    tags: ['texte', 'recherche-texte'],
+    cmp: { eg: 'sansobjet', plage: 'sansobjet', agr: 'sansobjet', ecr: 'fond', pour: 'La recherche en langue' }
+  },
+  {
+    id: 'spatial', fam: 'adv', icon: 'map',
+    name: 'Spatial', tagline: 'Chercher par la forme, pas par la valeur',
+    principle: "L'espace est découpé en une grille à quatre niveaux et l'index range les objets dans les cases. Une requête de proximité ne compare alors qu'aux objets des cases voisines, au lieu de calculer 1 500 distances.",
+    analogy: "« quels groupes sont à moins de 500 mètres de la future station ? » La latitude et la longitude sont bien dans <b>patrimoine</b>, mais un index sur (Latitude, Longitude) ne sait pas répondre : une distance n'est pas un intervalle.",
+    query: `DECLARE @station geography = geography::Point(48.1113, -1.6800, 4326);
+
+SELECT ID_patrimoine, Libelle_patrimoine,
+       Position.STDistance(@station) AS Distance_m
+FROM   dbo.patrimoine
+WHERE  Position.STDistance(@station) <= 500
+ORDER  BY Distance_m;`,
+    sql: `-- Position est de type geography, alimentée depuis
+-- Latitude et Longitude au chargement (SRID 4326)
+CREATE SPATIAL INDEX SX_patrimoine_position
+    ON dbo.patrimoine (Position)
+    USING GEOGRAPHY_AUTO_GRID;`,
+    when: "Dès que la question est une <b>forme</b> : rayon autour d'un point, appartenance à un quartier, distance entre deux adresses, découpage de tournées.",
+    versus: "Deux familles à ne pas confondre : <b>geometry</b> travaille dans un plan, <b>geography</b> sur le globe. Pour des latitudes et longitudes WGS 84 — celles de l'export patrimoine — c'est <b>geography</b>. Et l'index spatial exige une clé primaire clustered sur la table.",
+    tags: ['geo', 'recherche'],
+    cmp: { eg: 'sansobjet', plage: 'sansobjet', agr: 'sansobjet', ecr: 'lourd', pour: 'Proximité et zones' }
+  },
+  {
+    id: 'xml', fam: 'adv', icon: 'code',
+    name: 'XML', tagline: 'Interroger un document sans le relire',
+    principle: "L'index XML primaire éclate le document en une table interne, un nœud par ligne. Les index secondaires — <b>PATH</b>, <b>VALUE</b>, <b>PROPERTY</b> — s'y posent ensuite, selon la forme des questions posées.",
+    analogy: "le DPE arrive du diagnostiqueur en XML et se stocke tel quel. « Quels logements sont classés E, F ou G ? » oblige sinon à ouvrir et reparcourir chaque document, un par un, à chaque exécution.",
+    query: `SELECT d.ID_lot,
+       d.Contenu_xml.value('(/DPE/Etiquette_energie)[1]', 'char(1)') AS Etiquette
+FROM   dbo.diagnostic AS d
+WHERE  d.Contenu_xml.exist('/DPE[Etiquette_energie = ("E","F","G")]') = 1;`,
+    sql: `CREATE PRIMARY XML INDEX PXI_diagnostic_contenu
+    ON dbo.diagnostic (Contenu_xml);
+
+CREATE XML INDEX SXI_diagnostic_valeur
+    ON dbo.diagnostic (Contenu_xml)
+    USING XML INDEX PXI_diagnostic_contenu FOR VALUE;`,
+    when: "Quand des données semi-structurées vivent dans une colonne <b>xml</b> : DPE, états des lieux, échanges avec un partenaire.",
+    versus: "Le coût est rarement anticipé : l'index primaire pèse souvent deux à trois fois le XML lui-même, et il exige une clé primaire clustered. Si les requêtes ne visent jamais que deux ou trois balises, une <b>colonne calculée PERSISTED</b> qui les extrait coûte beaucoup moins cher.",
+    tags: ['xml', 'recherche'],
+    cmp: { eg: 'sansobjet', plage: 'sansobjet', agr: 'sansobjet', ecr: 'lourd', pour: 'Les balises d’un document' }
+  },
+  {
+    id: 'hash', fam: 'mem', icon: 'zap',
+    name: 'Hash (mémoire)', tagline: "L'égalité, à la microseconde",
+    principle: "Une table de hachage en mémoire : la clé est hachée, le résultat désigne directement un seau. Le temps d'accès ne dépend pas du nombre de lignes — mais le hachage détruit l'ordre.",
+    analogy: "la session d'un agent en visite est vérifiée à chaque appel de l'application de tournée. C'est toujours exactement la même question, « cette session existe-t-elle ? », et jamais une plage.",
+    query: `SELECT ID_agent, Ouverte_le
+FROM   dbo.session_agent
+WHERE  ID_session = @session;   -- égalité stricte, sur toute la clé`,
+    sql: `CREATE TABLE dbo.session_agent (
+    ID_session NVARCHAR(50) COLLATE Latin1_General_100_BIN2 NOT NULL,
+    ID_agent   INT       NOT NULL,
+    Ouverte_le DATETIME2 NOT NULL,
+    CONSTRAINT PK_session_agent PRIMARY KEY NONCLUSTERED
+        HASH (ID_session) WITH (BUCKET_COUNT = 131072)
+) WITH (MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_AND_DATA);`,
+    when: "Pour une latence extrême sur une question d'égalité stricte, sur une table qui tient en mémoire : sessions, verrous applicatifs, files de travail.",
+    versus: "Un hash ignore l'ordre : ni <b>BETWEEN</b>, ni <b>&gt;</b>, ni <b>ORDER BY</b>. Et il exige <b>toutes</b> les colonnes de la clé dans le prédicat — un hash sur (A, B) ne sert pas « WHERE A = ». Dès qu'il y a une plage, c'est le non-clustered en mémoire. <b>BUCKET_COUNT</b> s'arrondit à la puissance de deux supérieure : visez une à deux fois le nombre de clés distinctes.",
+    tags: ['egalite', 'memoire', 'latence', 'oltp'],
+    cmp: { eg: 'oui', plage: 'non', agr: 'non', ecr: 'leger', pour: 'Égalité stricte, latence' }
+  },
+  {
+    id: 'ncmemory', fam: 'mem', icon: 'clock',
+    name: 'Non-Clustered mémoire', tagline: "L'ordre, en mémoire",
+    principle: "L'index d'arbre des tables en mémoire, sans verrou ni loquet. Il garde l'ordre : plages, <b>ORDER BY</b> et recherche sur un préfixe de clé — dans le sens où il a été déclaré.",
+    analogy: "la file des demandes de logement se lit par ancienneté pour préparer une commission d'attribution. C'est une plage triée, pas une égalité : le hash ne sait pas la servir.",
+    query: `SELECT TOP (50) ID_demande, Date_inscription, Code_commune_souhaitee
+FROM   dbo.demande_logement
+WHERE  Date_inscription <= DATEADD(year, -1, SYSDATETIME())
+ORDER  BY Date_inscription ASC;`,
+    sql: `CREATE TABLE dbo.demande_logement (
+    ID_demande             INT     NOT NULL,
+    Date_inscription       DATE    NOT NULL,
+    Code_commune_souhaitee CHAR(5) NOT NULL,
+    CONSTRAINT PK_demande_logement PRIMARY KEY NONCLUSTERED (ID_demande),
+    INDEX IX_demande_anciennete NONCLUSTERED (Date_inscription ASC)
+) WITH (MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_AND_DATA);`,
+    when: "Latence extrême <b>avec</b> besoin de plage ou de tri : files d'attente, plannings, réservations, compteurs datés.",
+    versus: "Le sens du tri compte, ici seulement : un index en mémoire déclaré <b>ASC</b> ne sert pas un <b>ORDER BY … DESC</b>, alors qu'un index ordinaire se parcourt dans les deux sens. Le hash serait plus rapide en égalité pure, mais muet sur les plages.",
+    tags: ['plage', 'tri', 'memoire', 'latence'],
+    cmp: { eg: 'oui', plage: 'oui', agr: 'non', ecr: 'leger', pour: 'Plages et tri, latence' }
+  }
+];
+
+/* Les colonnes du tableau comparatif, et la facon de lire chaque valeur. */
+var CMP_COLONNES = [
+  { cle: 'eg', titre: 'Égalité' },
+  { cle: 'plage', titre: 'Plage / tri' },
+  { cle: 'agr', titre: 'Agrégation' },
+  { cle: 'ecr', titre: 'Coût en écriture' }
+];
+var CMP_VALEURS = {
+  oui:    { texte: 'Oui', couleur: 'vert' },
+  non:    { texte: 'Non', couleur: '' },
+  leger:  { texte: 'Léger', couleur: 'vert' },
+  moyen:  { texte: 'Moyen', couleur: 'ambre' },
+  lourd:  { texte: 'Lourd', couleur: 'rouge' },
+  inclus: { texte: 'C’est la table', couleur: '' },
+  fond:   { texte: 'Tâche de fond', couleur: 'ambre' },
+  /* Full-Text, Spatial et XML ne repondent pas a une question de valeur :
+     dire « non » les ferait passer pour moins capables, alors que la colonne
+     ne parle simplement pas d'eux. */
+  sansobjet: { texte: '—', couleur: 'sans-objet' }
+};
+
+var PRACTICES = [
+  { icon: 'bars', t: 'Peser la lecture contre l’écriture',
+    d: "Un index se juge sur les deux plateaux. Sur ligne_quittance, un index de plus, c'est 75 000 maintenances de plus chaque nuit de quittancement — pour une requête qui tourne peut-être deux fois par mois." },
+  { icon: 'search', t: 'Mesurer avant de supprimer',
+    d: "sys.dm_db_index_usage_stats dit qui lit quoi. Un index à zéro lecture et des milliers de mises à jour est une dette pure. Attention : le compteur repart à zéro au redémarrage du service — lisez-le après un cycle complet, quittancement compris." },
+  { icon: 'clock', t: 'Entretenir, sans rituel inutile',
+    d: "Réorganiser au-delà de 10 % de fragmentation, reconstruire au-delà de 30 %, et actualiser les statistiques : c'est souvent la statistique périmée, plus que la fragmentation, qui fait basculer un plan d'exécution." },
+  { icon: 'code', t: 'Écrire pourquoi, pas seulement quoi',
+    d: "Chaque index devrait pouvoir nommer la requête qu'il sert et l'écran qui la déclenche. Sans cette trace, plus personne n'ose supprimer quoi que ce soit trois ans plus tard." }
+];
+
+/* Deux requetes de diagnostic, a garder sous la main. */
+var DIAGNOSTICS = [
+  { titre: 'Les index que personne ne lit',
+    note: "Lecture faible et mises à jour nombreuses : candidats à la suppression. Les compteurs repartent de zéro au redémarrage du service.",
+    sql: `SELECT   OBJECT_NAME(i.object_id)   AS Table_nom,
+         i.name                     AS Index_nom,
+         ISNULL(s.user_seeks, 0)    AS Recherches,
+         ISNULL(s.user_scans, 0)    AS Balayages,
+         ISNULL(s.user_updates, 0)  AS Maintenances
+FROM     sys.indexes AS i
+LEFT JOIN sys.dm_db_index_usage_stats AS s
+       ON  s.object_id   = i.object_id
+       AND s.index_id    = i.index_id
+       AND s.database_id = DB_ID()
+WHERE    i.type_desc = 'NONCLUSTERED'
+  AND    OBJECTPROPERTY(i.object_id, 'IsUserTable') = 1
+ORDER BY Recherches + Balayages ASC, Maintenances DESC;`
+  },
+  { titre: 'Les index que le moteur réclame',
+    note: "Ce que l'optimiseur aurait voulu trouver. À lire comme un signalement, jamais à appliquer tel quel : ces suggestions se recoupent et ignorent le coût en écriture.",
+    sql: `SELECT   d.statement                  AS Table_nom,
+         d.equality_columns          AS Colonnes_egalite,
+         d.inequality_columns        AS Colonnes_plage,
+         d.included_columns          AS Colonnes_incluses,
+         s.avg_user_impact           AS Gain_estime_pct,
+         s.user_seeks                AS Occurrences
+FROM     sys.dm_db_missing_index_details AS d
+JOIN     sys.dm_db_missing_index_groups  AS g ON g.index_handle = d.index_handle
+JOIN     sys.dm_db_missing_index_group_stats AS s ON s.group_handle = g.index_group_handle
+WHERE    d.database_id = DB_ID()
+ORDER BY s.avg_user_impact * s.user_seeks DESC;`
+  }
+];
+
+/* =========================================================================
+   Le questionnaire. Chaque option pointe des index et dit pourquoi.
+   ========================================================================= */
+var QUESTIONS = [
+  {
+    id: 'role', type: 'radio', n: 1,
+    title: "Quel est le rôle de la colonne à indexer ?",
+    sub: 'Le point de départ de toute table.',
+    options: [
+      { v: 'pk', t: 'La clé primaire, la structure de base', d: 'Identifiant, ordre naturel des lignes',
+        eff: [{ id: 'clustered', w: 3, r: 'Clé primaire : c’est la fondation, donc le clustered.' }] },
+      { v: 'search', t: 'Une colonne de recherche fréquente', d: 'Utilisée dans WHERE ou JOIN',
+        eff: [{ id: 'nonclustered', w: 3, r: 'Colonne fréquente en WHERE ou JOIN : cas d’école du non-clustered.' }] }
+    ]
+  },
+  {
+    id: 'search', type: 'radio', n: 2,
+    title: 'Quelle forme prend la recherche ?',
+    sub: 'La forme du filtre oriente plus que la nature de la donnée.',
+    options: [
+      { v: 'eq', t: 'Égalité exacte', d: "Indicateur_statut_presence = 'O', Code_client = …",
+        eff: [{ id: 'nonclustered', w: 2, r: 'L’égalité exacte se traite très bien en non-clustered.' }] },
+      { v: 'range', t: 'Plage ou tri', d: 'BETWEEN, >, <, ORDER BY sur des mois ou des montants',
+        eff: [{ id: 'clustered', w: 2, r: 'Les plages et les tris tirent parti de l’ordre physique du clustered.' },
+               { id: 'nonclustered', w: 1, r: 'Un non-clustered ordonné couvre aussi les plages ciblées.' }] },
+      { v: 'text', t: 'Dans du texte libre', d: 'Comptes rendus d’intervention, courriers',
+        eff: [{ id: 'fulltext', w: 4, r: 'Texte libre : le full-text gère les formes fléchies et la proximité, pas le LIKE.' }] },
+      { v: 'geo', t: 'Par la géographie', d: 'Rayon, distance, appartenance à une zone',
+        eff: [{ id: 'spatial', w: 4, r: 'Une distance n’est pas un intervalle : c’est le rôle de l’index spatial.' }] },
+      { v: 'xml', t: 'Dans un document XML', d: 'DPE, états des lieux stockés en xml',
+        eff: [{ id: 'xml', w: 4, r: 'Interrogation XQuery : l’index XML évite de reparcourir le document.' }] }
+    ]
+  },
+  {
+    id: 'charge', type: 'radio', n: 3,
+    title: 'Quelle est la nature de la charge ?',
+    sub: 'Transactionnel au fil de l’eau, ou analytique de masse ?',
+    options: [
+      { v: 'oltp', t: 'Transactionnel', d: 'Quittancement, encaissements, mises à jour de dossiers',
+        eff: [{ id: 'nonclustered', w: 1, r: 'En transactionnel, des non-clustered ciblés gardent les écritures légères.' }] },
+      { v: 'olap', t: 'Analytique et reporting', d: 'Agrégations sur l’historique, Power BI',
+        eff: [{ id: 'columnstore', w: 4, r: 'Agrégation sur tout l’historique : le columnstore change d’échelle.' }] }
+    ]
+  },
+  {
+    id: 'contraintes', type: 'checkbox', n: 4,
+    title: 'Des contraintes particulières ?',
+    sub: 'Plusieurs choix possibles.',
+    options: [
+      { v: 'unique', t: 'Garantir l’unicité', d: 'Numéro de quittance, code client',
+        eff: [{ id: 'unique', w: 3, r: 'Unicité stricte : l’index unique la fait tenir au niveau de la base.' }] },
+      { v: 'subset', t: 'Ne viser qu’un sous-ensemble', d: 'Les impayés, les baux en cours',
+        eff: [{ id: 'filtered', w: 3, r: 'Toujours le même sous-ensemble : l’index filtré est plus léger et mieux estimé.' }] },
+      { v: 'cover', t: 'Éviter les allers-retours', d: 'La requête renvoie toujours les mêmes colonnes',
+        eff: [{ id: 'included', w: 3, r: 'Couvrir la requête sans key lookup : colonnes incluses.' }] },
+      { v: 'formula', t: 'Filtrer sur une valeur calculée', d: 'Loyer résiduel, ancienneté en mois',
+        eff: [{ id: 'computed', w: 3, r: 'Filtre récurrent sur une formule : colonne calculée PERSISTED, puis index.' }] },
+      { v: 'latency', t: 'Latence extrême en mémoire', d: 'Réponse à la microseconde',
+        eff: [{ id: 'hash', w: 3, r: 'Latence extrême en égalité stricte : index hash en mémoire.' },
+               { id: 'ncmemory', w: 2, r: 'Latence extrême avec plages ou tri : non-clustered en mémoire.' }] }
+    ]
+  }
+];
+
+/* Affinage croise : la latence et la forme de la recherche se repondent. */
+var CROSS = function (rep) {
+  var bump = [];
+  var contr = rep.contraintes || [];
+  if (contr.indexOf('latency') >= 0) {
+    if (rep.search === 'eq') bump.push({ id: 'hash', w: 2, r: 'Égalité exacte et mémoire : le hash est le plus direct.' });
+    if (rep.search === 'range') bump.push({ id: 'ncmemory', w: 2, r: 'Plage ou tri en mémoire : le hash ne sait pas, l’arbre si.' });
+  }
+  if (rep.charge === 'olap' && contr.indexOf('cover') >= 0) {
+    bump.push({ id: 'columnstore', w: 1, r: 'En analytique, le columnstore couvre déjà la requête colonne par colonne.' });
   }
   return bump;
 };
 
-/* =========================================================
-   FILTRES (page Choisir — explorer)
-   ========================================================= */
-const FILTERS = [
-  {v:"analytique", t:"Analyser / agréger"},
-  {v:"recherche-texte", t:"Chercher du texte"},
-  {v:"geo", t:"Requêter de la géo"},
-  {v:"unicite", t:"Garantir l'unicité"},
-  {v:"sousensemble", t:"Cibler un sous-ensemble"},
-  {v:"couverture", t:"Éviter les lookups"},
-  {v:"plage", t:"Faire des plages / tris"},
-  {v:"egalite", t:"Chercher en égalité"},
-  {v:"memoire", t:"Latence mémoire"},
-  {v:"calcul", t:"Indexer un calcul"},
-  {v:"xml", t:"Interroger du XML"},
+var FILTERS = [
+  { v: 'analytique', t: 'Analyser, agréger' },
+  { v: 'recherche-texte', t: 'Chercher du texte' },
+  { v: 'geo', t: 'Requêter de la géo' },
+  { v: 'unicite', t: 'Garantir l’unicité' },
+  { v: 'sousensemble', t: 'Cibler un sous-ensemble' },
+  { v: 'couverture', t: 'Éviter les lookups' },
+  { v: 'plage', t: 'Faire des plages, des tris' },
+  { v: 'egalite', t: 'Chercher en égalité' },
+  { v: 'memoire', t: 'Latence mémoire' },
+  { v: 'calcul', t: 'Indexer un calcul' },
+  { v: 'xml', t: 'Interroger du XML' }
+];
+
+/* =========================================================================
+   La carte des familles. Quatre familles, et a l'interieur de chacune des
+   sous-groupes qui disent ce qui separe deux index voisins. C'est la seule
+   page ou les douze index se lisent d'un coup, par nature.
+   ========================================================================= */
+var CARTOGRAPHIE = [
+  {
+    fam: 'base',
+    question: 'Comment la table est-elle rangée, et par où y entre-t-on ?',
+    propos: "Les deux structures qu'on pose avant toute chose. Elles indexent une <b>valeur de colonne</b>, dans un arbre B, sur disque.",
+    sous: [
+      { titre: 'La table elle-même', note: 'Une seule par table : elle porte les lignes.', ids: ['clustered'] },
+      { titre: 'Les répertoires posés à côté', note: 'Autant qu’on veut, chacun payé à l’écriture.', ids: ['nonclustered', 'unique'] }
+    ]
+  },
+  {
+    fam: 'spec',
+    question: 'Comment rendre un index moins cher, ou plus complet ?',
+    propos: "Trois façons d'agir sur un non-clustered ordinaire : lui donner moins de lignes, plus de colonnes, ou un tout autre mode de stockage.",
+    sous: [
+      { titre: 'Moins de lignes', note: 'Le prédicat retire ce qu’on ne lit jamais.', ids: ['filtered'] },
+      { titre: 'Plus de colonnes', note: 'Le retour à la table disparaît.', ids: ['included'] },
+      { titre: 'Un autre stockage', note: 'Par colonne, et non plus par ligne.', ids: ['columnstore'] }
+    ]
+  },
+  {
+    fam: 'adv',
+    question: 'Et quand la donnée n’est pas une simple valeur ?',
+    propos: "Un arbre B sait ranger un nombre, une date, une chaîne. Il ne sait rien faire d'une phrase, d'un document ou d'un point sur le globe : ces index-là ont leur propre structure.",
+    sous: [
+      { titre: 'Une valeur qui n’existe pas encore', note: 'La formule devient une colonne, donc indexable.', ids: ['computed'] },
+      { titre: 'Un contenu', note: 'Index inversé pour le texte, table de nœuds pour le XML.', ids: ['fulltext', 'xml'] },
+      { titre: 'Une forme', note: 'Une grille, parce qu’une distance n’est pas un intervalle.', ids: ['spatial'] }
+    ]
+  },
+  {
+    fam: 'mem',
+    question: 'Et quand la milliseconde est déjà trop lente ?',
+    propos: "La table entière vit en mémoire, sans verrou ni loquet. L'index n'est plus un objet posé sur des pages : c'est la structure d'accès elle-même, et il faut choisir laquelle.",
+    sous: [
+      { titre: 'Sans ordre', note: 'Accès direct, mais égalité stricte uniquement.', ids: ['hash'] },
+      { titre: 'Avec ordre', note: 'Plages et tri, dans un seul sens.', ids: ['ncmemory'] }
+    ]
+  }
+];
+
+/* Trois axes qui traversent les quatre familles. Deux index de familles
+   differentes peuvent se ressembler sur un axe et s'opposer sur un autre :
+   c'est ce que la carte seule ne montre pas. */
+var AXES = [
+  { axe: 'Où vivent les données',
+    gauche: 'Sur disque, en pages de 8 Ko', gauche_ids: ['clustered', 'nonclustered', 'unique', 'filtered', 'included', 'columnstore', 'computed', 'fulltext', 'spatial', 'xml'],
+    droite: 'En mémoire, tout le temps', droite_ids: ['hash', 'ncmemory'] },
+  { axe: 'Comment elles sont rangées',
+    gauche: 'Par ligne : on lit une ligne entière', gauche_ids: ['clustered', 'nonclustered', 'unique', 'filtered', 'included', 'computed', 'hash', 'ncmemory'],
+    droite: 'Par colonne : on lit une colonne entière', droite_ids: ['columnstore'] },
+  { axe: 'Ce que l’index sait faire de l’ordre',
+    gauche: 'Il le garde : plages, tri, préfixe', gauche_ids: ['clustered', 'nonclustered', 'unique', 'filtered', 'included', 'computed', 'ncmemory'],
+    droite: 'Il l’ignore : égalité ou forme seulement', droite_ids: ['hash', 'columnstore', 'fulltext', 'spatial', 'xml'] }
 ];
 
 /* ===========================================================================
@@ -1275,21 +1774,44 @@ const FILTERS = [
     return texte.normalize ? texte.normalize('NFD').replace(/[̀-ͯ]/g, '') : texte;
   }
 
-  /* Les libelles de fiche portent quelques <b> voulus par l'auteur ; ils sont
-     ecrits dans le fichier, pas saisis par un tiers, et passent donc tels
-     quels. Tout le reste est echappe. */
-  function svg(trace, taille) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"'
-      + ' stroke-linecap="round" stroke-linejoin="round"'
-      + (taille ? ' width="' + taille + '" height="' + taille + '"' : '') + '>' + trace + '</svg>';
+  /* Les libelles du fichier de donnees portent quelques <b> voulus par
+     l'auteur ; ils sont ecrits dans la page, pas saisis par un tiers, et
+     passent donc tels quels. Tout ce qui vient d'ailleurs est echappe. */
+
+  function svg(trace, classe) {
+    return '<svg' + (classe ? ' class="' + classe + '"' : '')
+      + ' viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"'
+      + ' stroke-linecap="round" stroke-linejoin="round">' + trace + '</svg>';
+  }
+
+  var OUI = '<polyline points="20 6 9 17 4 12"/>';
+  var NON = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+
+  function trouve(id) {
+    var t = INDEXES.filter(function (x) { return x.id === id; });
+    return t.length ? t[0] : null;
+  }
+
+  /** Le nom d'un index, avec la pastille de sa famille. */
+  function puceIndex(id) {
+    var ix = trouve(id);
+    if (!ix) return '';
+    return '<span class="puce-index ' + FAM[ix.fam].classe + '" role="button" tabindex="0"'
+      + ' data-index="' + ech(ix.id) + '" title="Voir la fiche ' + ech(ix.name) + '">'
+      + '<span class="pastille-fam"></span>' + ech(ix.name) + '</span>';
   }
 
   /* ------------------------------------------------------------------ SQL */
 
   var MOTS = ['CREATE', 'CLUSTERED', 'NONCLUSTERED', 'COLUMNSTORE', 'UNIQUE', 'SPATIAL',
     'PRIMARY', 'FULLTEXT', 'INDEX', 'CATALOG', 'ON', 'INCLUDE', 'WHERE', 'ALTER', 'TABLE',
-    'ADD', 'AS', 'PERSISTED', 'USING', 'GEOMETRY_GRID', 'WITH', 'HASH', 'MEMORY_OPTIMIZED',
-    'BUCKET_COUNT', 'KEY', 'INT'];
+    'ADD', 'AS', 'PERSISTED', 'USING', 'WITH', 'HASH', 'KEY', 'INT', 'SELECT', 'FROM',
+    'JOIN', 'LEFT', 'GROUP', 'BY', 'ORDER', 'AND', 'OR', 'NOT', 'NULL', 'IS', 'IN',
+    'BETWEEN', 'INSERT', 'VALUES', 'DECLARE', 'TOP', 'DESC', 'ASC', 'CONSTRAINT',
+    'DEFAULT', 'LANGUAGE', 'COLLATE', 'CONTAINS', 'AVG', 'ISNULL', 'DATEADD',
+    'SYSDATETIME', 'OBJECT_NAME', 'OBJECTPROPERTY', 'DB_ID', 'NVARCHAR', 'DATETIME2',
+    'DATE', 'CHAR', 'MEMORY_OPTIMIZED', 'DURABILITY', 'SCHEMA_AND_DATA', 'BUCKET_COUNT',
+    'CHANGE_TRACKING', 'AUTO', 'GEOGRAPHY_AUTO_GRID', 'VALUE', 'PATH', 'PROPERTY'];
 
   /** Coloration legere, posee sur du texte deja echappe. */
   function colorer(sql) {
@@ -1300,8 +1822,9 @@ const FILTERS = [
     return s;
   }
 
-  function blocSql(sql, cle) {
+  function blocSql(sql, cle, etiquette) {
     return '<div class="sql">'
+      + (etiquette ? '<div class="etiquette-champ">' + ech(etiquette) + '</div>' : '')
       + '<button type="button" class="copier" data-copie="' + ech(cle) + '">Copier</button>'
       + '<pre class="bloc-code" id="sql-' + ech(cle) + '">' + colorer(sql) + '</pre></div>';
   }
@@ -1336,10 +1859,89 @@ const FILTERS = [
     }).join('');
   }
 
+  function poserCouts() {
+    $('couts').innerHTML = '<div class="cadre-table"><table><thead><tr>'
+      + '<th>Ce que le moteur fait</th><th class="num">Pages lues</th><th>Pourquoi</th>'
+      + '</tr></thead><tbody>'
+      + COUTS.map(function (c) {
+        return '<tr><td>' + ech(c.cas) + '</td>'
+          + '<td class="num"><span class="jeton ' + c.verdict + '">' + ech(c.pages) + '</span></td>'
+          + '<td>' + ech(c.note) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+
+  function poserModele() {
+    $('modele').innerHTML = '<div class="cadre-table"><table><thead><tr>'
+      + '<th>Table</th><th>Grain</th><th class="num">Lignes</th>'
+      + '<th>Écriture</th><th>Lecture dominante</th>'
+      + '</tr></thead><tbody>'
+      + MODELE.map(function (m) {
+        return '<tr><td class="tech">' + ech(m.table) + '</td>'
+          + '<td>' + ech(m.grain) + '</td>'
+          + '<td class="num">' + ech(m.volume) + '</td>'
+          + '<td>' + ech(m.ecriture) + '</td>'
+          + '<td>' + ech(m.lecture) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+
+  function poserMoments() {
+    $('moments').innerHTML = MOMENTS.map(function (m) {
+      return '<div class="moment"><div class="heure">' + ech(m.heure) + '</div>'
+        + '<h4>' + ech(m.titre) + '</h4>'
+        + '<p class="quoi">' + ech(m.quoi) + '</p>'
+        + '<p class="regime">' + m.regime + '</p>'
+        + '<span class="jeton">' + ech(m.index) + '</span></div>';
+    }).join('');
+  }
+
+  function poserCartographie() {
+    $('cartographie').innerHTML = CARTOGRAPHIE.map(function (f) {
+      return '<div class="famille-carte ' + FAM[f.fam].classe + '">'
+        + '<div class="famille-tete">'
+        + '<span class="famille-nom"><span class="pastille-fam"></span>' + ech(FAM[f.fam].libelle) + '</span>'
+        + '<p class="famille-question">' + ech(f.question) + '</p></div>'
+        + '<p class="famille-propos">' + f.propos + '</p>'
+        + f.sous.map(function (s) {
+          return '<div class="sous-groupe"><div class="sous-titre">' + ech(s.titre) + '</div>'
+            + '<div class="sous-note">' + ech(s.note) + '</div>'
+            + '<div class="sous-index">' + s.ids.map(puceIndex).join('') + '</div></div>';
+        }).join('')
+        + '</div>';
+    }).join('');
+  }
+
+  function poserAxes() {
+    $('axes').innerHTML = AXES.map(function (a) {
+      return '<div class="axe"><div class="axe-titre">' + ech(a.axe) + '</div>'
+        + '<div class="axe-cotes">'
+        + '<div class="cote"><div class="cote-libelle">' + ech(a.gauche) + '</div>'
+        + '<div class="cote-index">' + a.gauche_ids.map(puceIndex).join('') + '</div></div>'
+        + '<div class="cote"><div class="cote-libelle">' + ech(a.droite) + '</div>'
+        + '<div class="cote-index">' + a.droite_ids.map(puceIndex).join('') + '</div></div>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  function poserPrefixe() {
+    $('prefixe').innerHTML = '<div class="cadre-table"><table><thead><tr>'
+      + '<th>La requête</th><th>Servie&nbsp;?</th><th>Ce que fait le moteur</th>'
+      + '</tr></thead><tbody>'
+      + PREFIXE.map(function (p) {
+        return '<tr><td class="tech">' + ech(p.requete) + '</td>'
+          + '<td><span class="jeton ' + (p.ok ? 'vert' : 'rouge') + '">'
+          + svg(p.ok ? OUI : NON, 'mini-icone') + (p.ok ? 'Oui' : 'Non') + '</span></td>'
+          + '<td>' + ech(p.quoi) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+
   /* --------------------------------------------------------- le catalogue */
 
   var famille = 'toutes';
   var recherche = '';
+  /* Une fiche demandee par son nom depuis la carte des familles. Chercher
+     « Clustered » en texte libre ramene onze fiches sur douze, puisque toutes
+     en parlent ; quand on clique un nom, c'est cette fiche-la qu'on veut. */
+  var cible = null;
 
   function poserFamilles() {
     var choix = [{ cle: 'toutes', libelle: 'Toutes' }];
@@ -1353,9 +1955,11 @@ const FILTERS = [
   }
 
   function retenu(ix) {
+    if (cible) return ix.id === cible;
     if (famille !== 'toutes' && ix.fam !== famille) return false;
     if (!recherche) return true;
-    var champs = [ix.name, ix.tagline, ix.principle, ix.when, ix.analogy, ix.tags.join(' ')];
+    var champs = [ix.name, ix.tagline, ix.principle, ix.when, ix.analogy,
+      ix.versus, ix.query, ix.sql, ix.tags.join(' ')];
     for (var i = 0; i < champs.length; i++) {
       if (nu(champs[i]).indexOf(nu(recherche)) >= 0) return true;
     }
@@ -1382,13 +1986,17 @@ const FILTERS = [
         + '<span class="embleme">' + svg(IC[ix.icon]) + '</span></header>'
         + '<div class="corps">'
         + '<div class="champ"><div class="etiquette-champ">Principe</div><p>' + ix.principle + '</p></div>'
-        + '<div class="analogie"><span class="qui">Logement social —</span> ' + ix.analogy + '</div>'
+        + '<div class="analogie"><span class="qui">Chez un bailleur —</span> ' + ix.analogy + '</div>'
         + '<div class="champ"><div class="etiquette-champ">Quand l\'utiliser</div><p>' + ix.when + '</p></div>'
+        + '<div class="versus"><div class="etiquette-champ">Ce qui le distingue</div><p>' + ix.versus + '</p></div>'
         + '<div>'
         + '<button type="button" class="bouton-discret replier" aria-expanded="false" data-sql="' + ech(ix.id) + '">'
         + svg('<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>')
-        + '<span>Voir le SQL</span></button>'
-        + '<div hidden id="volet-' + ech(ix.id) + '">' + blocSql(ix.sql, 'fiche-' + ix.id) + '</div>'
+        + '<span>Voir la requête et l\'index</span></button>'
+        + '<div hidden id="volet-' + ech(ix.id) + '">'
+        + blocSql(ix.query, 'req-' + ix.id, 'La requête à servir')
+        + blocSql(ix.sql, 'idx-' + ix.id, 'L\'index qui la sert')
+        + '</div>'
         + '</div></div></section>';
     }).join('');
   }
@@ -1402,8 +2010,29 @@ const FILTERS = [
     var ouvert = volet.hidden;
     volet.hidden = !ouvert;
     bouton.setAttribute('aria-expanded', String(ouvert));
-    bouton.querySelector('span').textContent = ouvert ? 'Masquer le SQL' : 'Voir le SQL';
+    bouton.querySelector('span').textContent = ouvert
+      ? 'Masquer la requête et l\'index' : 'Voir la requête et l\'index';
   });
+
+  /* ------------------------------------------------------------ comparer */
+
+  function poserComparatif() {
+    $('comparatif').innerHTML = '<div class="cadre-table"><table><thead><tr>'
+      + '<th>Index</th><th>Famille</th>'
+      + CMP_COLONNES.map(function (c) { return '<th>' + ech(c.titre) + '</th>'; }).join('')
+      + '<th>Employé pour</th></tr></thead><tbody>'
+      + INDEXES.map(function (ix) {
+        return '<tr class="' + FAM[ix.fam].classe + '">'
+          + '<td><b>' + ech(ix.name) + '</b></td>'
+          + '<td><span class="famille-cellule"><span class="pastille-fam"></span>'
+          + ech(FAM[ix.fam].libelle) + '</span></td>'
+          + CMP_COLONNES.map(function (c) {
+            var v = CMP_VALEURS[ix.cmp[c.cle]] || { texte: ix.cmp[c.cle], couleur: '' };
+            return '<td><span class="jeton ' + v.couleur + '">' + ech(v.texte) + '</span></td>';
+          }).join('')
+          + '<td>' + ech(ix.cmp.pour) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
 
   /* ------------------------------------------------------------- choisir */
 
@@ -1494,7 +2123,7 @@ const FILTERS = [
       ? gardes.length + ' index à considérer' : 'Index recommandé';
 
     $('reco').innerHTML = gardes.map(function (id, rang) {
-      var ix = INDEXES.filter(function (x) { return x.id === id; })[0];
+      var ix = trouve(id);
       return '<div class="reco ' + FAM[ix.fam].classe + '">'
         + '<div class="tete-reco"><div>'
         + '<div class="nom">' + ech(ix.name) + '</div>'
@@ -1502,7 +2131,7 @@ const FILTERS = [
         + '<span class="jeton ' + (rang === 0 ? 'vert' : '') + '">'
         + (rang === 0 ? 'Meilleur choix' : 'À considérer') + '</span></div>'
         + '<ul class="motifs">' + motifs[id].map(function (m) {
-          return '<li>' + svg('<polyline points="20 6 9 17 4 12"/>') + '<span>' + ech(m) + '</span></li>';
+          return '<li>' + svg(OUI, 'mini-icone') + '<span>' + ech(m) + '</span></li>';
         }).join('') + '</ul>'
         + blocSql(ix.sql, 'reco-' + ix.id) + '</div>';
     }).join('');
@@ -1532,12 +2161,20 @@ const FILTERS = [
     }).join('');
   }
 
-  /* ------------------------------------------------------------- reflexes */
+  /* ------------------------------------------------------------- methode */
 
   function poserReflexes() {
     $('reflexes').innerHTML = PRACTICES.map(function (p) {
       return '<div class="reflexe"><div class="embleme">' + svg(IC[p.icon]) + '</div>'
         + '<div><h4>' + ech(p.t) + '</h4><p>' + ech(p.d) + '</p></div></div>';
+    }).join('');
+  }
+
+  function poserDiagnostics() {
+    $('diagnostics').innerHTML = DIAGNOSTICS.map(function (d, i) {
+      return '<div class="diagnostic"><h4>' + ech(d.titre) + '</h4>'
+        + '<p>' + ech(d.note) + '</p>'
+        + blocSql(d.sql, 'diag-' + i) + '</div>';
     }).join('');
   }
 
@@ -1605,11 +2242,15 @@ const FILTERS = [
     var bouton = e.target.closest ? e.target.closest('button[data-famille]') : null;
     if (!bouton) return;
     famille = bouton.dataset.famille;
+    cible = null;
+    $('recherche').value = '';
+    recherche = '';
     poserFamilles();
     poserFiches();
   });
 
   $('recherche').addEventListener('input', function () {
+    cible = null;
     recherche = this.value.trim();
     poserFiches();
   });
@@ -1617,6 +2258,7 @@ const FILTERS = [
   $('effacer').addEventListener('click', function () {
     famille = 'toutes';
     recherche = '';
+    cible = null;
     $('recherche').value = '';
     poserFamilles();
     poserFiches();
@@ -1630,6 +2272,34 @@ const FILTERS = [
     if (i >= 0) criteres.splice(i, 1); else criteres.push(v);
     bouton.setAttribute('aria-pressed', String(i < 0));
     poserMiniatures();
+  });
+
+  /* Un nom d'index cliquable, ou qu'il soit, mene a sa fiche : la carte des
+     familles et les axes servent a naviguer, pas seulement a lire. */
+  function ouvrirFiche(id) {
+    var ix = trouve(id);
+    if (!ix) return;
+    famille = 'toutes';
+    recherche = '';
+    cible = id;
+    $('recherche').value = ix.name;
+    poserFamilles();
+    poserFiches();
+    afficher('catalogue');
+  }
+
+  document.addEventListener('click', function (e) {
+    var puce = e.target.closest ? e.target.closest('.puce-index') : null;
+    if (puce) ouvrirFiche(puce.dataset.index);
+  });
+
+  /* Le nom d'un index est un bouton : il doit s'atteindre au clavier. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var puce = e.target.closest ? e.target.closest('.puce-index') : null;
+    if (!puce) return;
+    e.preventDefault();
+    ouvrirFiche(puce.dataset.index);
   });
 
   $('reinitialiser').addEventListener('click', function () {
@@ -1648,12 +2318,20 @@ const FILTERS = [
 
   appliquerTheme(themeMemorise(), false);
   poserChiffres();
+  poserCouts();
+  poserModele();
+  poserMoments();
+  poserCartographie();
+  poserAxes();
+  poserPrefixe();
   poserFamilles();
   poserFiches();
+  poserComparatif();
   poserQuestions();
   poserCriteres();
   poserMiniatures();
   poserReflexes();
+  poserDiagnostics();
   afficher(location.hash.replace('#', '') || 'principe', false);
 })();
 
